@@ -1903,10 +1903,10 @@ void ClientStartSprint(int client)
 
 void ClientSprintTimer(int client, bool recharge=false)
 {
-	float rate = (SF_SpecialRound(SPECIALROUND_COFFEE)) ? 0.8 : 0.4;
+	float rate = (SF_SpecialRound(SPECIALROUND_COFFEE)) ? 0.67 : 0.33;
 	if (recharge)
 	{
-		rate = (SF_SpecialRound(SPECIALROUND_COFFEE)) ? 1.7 : 0.6;
+		rate = (SF_SpecialRound(SPECIALROUND_COFFEE)) ? 1.42 : 0.5;
 	}
 
 	TFClassType class = TF2_GetPlayerClass(client);
