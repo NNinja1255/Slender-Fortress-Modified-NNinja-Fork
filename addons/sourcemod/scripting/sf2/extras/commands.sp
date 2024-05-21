@@ -409,8 +409,6 @@ public void OnPluginStart()
 	NPCInitialize();
 
 	SetupMenus();
-	
-	//Tutorial_Initialize();
 
 	SetupAdminMenu();
 

@@ -1380,8 +1380,6 @@ static void StopPlugin()
 	g_RenevantWallHax = false;
 
 	BossProfilesOnMapEnd();
-	
-	//Tutorial_OnMapEnd();
 
 	if (g_FuncNavPrefer != null)
 	{
