@@ -729,6 +729,8 @@ ConVar g_RenevantMaxWaves;
 ConVar g_SlaughterRunMapConVar;
 ConVar g_TimeEscapeSurvivalConVar;
 ConVar g_SlaughterRunDivisibleTimeConVar;
+ConVar g_SlaughterRunDefaultClassRunSpeedConVar;
+ConVar g_SlaughterRunMinimumBossRunSpeedConVar;
 ConVar g_UseAlternateConfigDirectoryConVar;
 ConVar g_PlayerKeepWeaponsConVar;
 ConVar g_FullyEnableSpectatorConVar;
@@ -5128,9 +5130,10 @@ void SetPageCount(int num)
 
 						float originalSpeed, speed, timerCheck;
 						originalSpeed = NPCGetSpeed(npcIndex, difficulty) + NPCGetAddSpeed(npcIndex);
-						if (originalSpeed < 600.0)
+						float slaughterSpeed = g_SlaughterRunMinimumBossRunSpeedConVar.FloatValue;
+						if (originalSpeed < slaughterSpeed)
 						{
-							originalSpeed = 600.0;
+							originalSpeed = slaughterSpeed;
 						}
 						if (g_RoundDifficultyModifier > 1.0)
 						{
@@ -5157,6 +5160,7 @@ void SetPageCount(int num)
 						{
 							averageTime += (times[i3] / GetRandomFloat(12.0, 22.0));
 						}
+						/*
 						switch (g_DifficultyConVar.IntValue)
 						{
 							case Difficulty_Normal:
@@ -5180,6 +5184,7 @@ void SetPageCount(int num)
 								averageTime += 5.0;
 							}
 						}
+						*/
 						PrintToChatAll("Time before bosses spawn: %f seconds", averageTime);
 						CreateTimer(averageTime, Timer_SlaughterRunSpawnBosses, _, TIMER_FLAG_NO_MAPCHANGE);
 					}

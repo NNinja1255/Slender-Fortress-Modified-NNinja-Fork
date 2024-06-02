@@ -619,6 +619,11 @@ float ClientGetDefaultSprintSpeed(int client, TFClassType class = TFClass_Unknow
 			returnFloat = 295.0;
 		}
 	}
+	
+	if (SF_IsSlaughterRunMap())
+	{
+		returnFloat = g_SlaughterRunDefaultClassRunSpeedConVar.FloatValue;
+	}
 
 	if (IsValidClient(client))
 	{

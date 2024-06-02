@@ -75,22 +75,35 @@ Action Timer_SlenderChaseBossThink(Handle timer, any entref) //God damn you are 
 			originalMaxSpeed = chaserBoss.GetMaxSpeed(difficulty);
 			originalAcceleration = chaserBoss.GetAcceleration(difficulty);
 		}
-		else if (SF_SpecialRound(SPECIALROUND_RUNNINGINTHE90S) || SF_IsSlaughterRunMap() || g_Renevant90sEffect)
+		else
 		{
 			originalSpeed = chaserBoss.GetSpeed(difficulty);
 			originalMaxSpeed = chaserBoss.GetMaxSpeed(difficulty);
 			originalAcceleration = chaserBoss.GetAcceleration(difficulty);
-			if (originalSpeed < (SF_IsSlaughterRunMap() ? 580.0 : 520.0))
+			if (SF_SpecialRound(SPECIALROUND_RUNNINGINTHE90S) || g_Renevant90sEffect)
 			{
-				originalSpeed = SF_IsSlaughterRunMap() ? 580.0 : 520.0;
+				if (originalSpeed < 520.0)
+				{
+					originalSpeed = 520.0;
+				}
+				if (originalMaxSpeed < 520.0)
+				{
+					originalMaxSpeed = 520.0;
+				}
+				originalAcceleration += 9001.0;
 			}
-			if (originalMaxSpeed < (SF_IsSlaughterRunMap() ? 580.0 : 520.0))
+			if (SF_IsSlaughterRunMap())
 			{
-				originalMaxSpeed = SF_IsSlaughterRunMap() ? 580.0 : 520.0;
-			}
-			if (originalAcceleration < (SF_IsSlaughterRunMap() ? 10000.0 : 9001.0))
-			{
-				originalAcceleration = SF_IsSlaughterRunMap() ? 10000.0 : 9001.0;
+				float slaughterSpeed = g_SlaughterRunMinimumBossRunSpeedConVar.FloatValue;
+				if (originalSpeed < slaughterSpeed)
+				{
+					originalSpeed = slaughterSpeed;
+				}
+				if (originalMaxSpeed < slaughterSpeed)
+				{
+					originalMaxSpeed = slaughterSpeed;
+				}
+				originalAcceleration += 10000.0;
 			}
 		}
 		originalSpeed += chaserBoss.GetAddSpeed();
