@@ -280,7 +280,7 @@ void PvP_OnGameFrame()
 				ownerEntity = GetEntPropEnt(ownerEntity, Prop_Data, "m_hOwnerEntity");
 			}
 
-			if (IsValidClient(ownerEntity) && IsClientInPvP(ownerEntity)) //(IsRoundInWarmup() || IsClientInPvP(ownerEntity))
+			if (IsValidClient(ownerEntity) && (IsRoundInWarmup() || IsClientInPvP(ownerEntity)))
 			{
 				GetEntPropVector(ent, Prop_Data, "m_vecAbsOrigin", flOrigin);
 
@@ -487,14 +487,14 @@ static void Hook_PvPProjectileBallOfFireTouchPost(int projectile, int otherEntit
 
 void PvP_OnPlayerSpawn(int client)
 {
-	PvP_SetPlayerPvPState(client, false, false, false);
-
-	g_PlayerIsLeavingPvP[client] = false;
-	
 	if (IsRoundInWarmup() || GameRules_GetProp("m_bInWaitingForPlayers"))
 	{
 		return;
 	}
+
+	PvP_SetPlayerPvPState(client, false, false, false);
+
+	g_PlayerIsLeavingPvP[client] = false;
 
 	if (IsPlayerAlive(client) && IsClientParticipating(client))
 	{
@@ -780,7 +780,7 @@ static void PvP_OnFlameEntityStartTouchPost(int flame,int other) //Thanks Fire
 		{
 			flasthit[other] = time + FLAME_HIT_DELAY;
 
-			if (IsClientInPvP(other) && !IsRoundEnding()) //(IsRoundInWarmup() || IsClientInPvP(other))
+			if ((IsRoundInWarmup() || IsClientInPvP(other)) && !IsRoundEnding())
 			{
 				int iFlamethrower = GetEntPropEnt(flame, Prop_Data, "m_hOwnerEntity");
 				if (IsValidEdict(iFlamethrower))
@@ -788,7 +788,7 @@ static void PvP_OnFlameEntityStartTouchPost(int flame,int other) //Thanks Fire
 					int ownerEntity = GetEntPropEnt(iFlamethrower, Prop_Data, "m_hOwnerEntity");
 					if (ownerEntity != other && IsValidClient(ownerEntity))
 					{
-						if (IsClientInPvP(ownerEntity)) //(IsRoundInWarmup() || IsClientInPvP(ownerEntity))
+						if (IsRoundInWarmup() || IsClientInPvP(ownerEntity))
 						{
 							if (GetClientTeam(other) == GetClientTeam(ownerEntity) && GetClientTeam(ownerEntity) != TFTeam_Red)
 							{
