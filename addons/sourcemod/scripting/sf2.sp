@@ -687,6 +687,7 @@ ConVar g_NewBossRoundIntervalConVar;
 ConVar g_NewBossRoundForceConVar;
 ConVar g_NewBossRoundIncludeMain;
 ConVar g_IgnoreRoundWinConditionsConVar;
+ConVar g_EscapeEliminationConVar;
 ConVar g_EnableWallHaxConVar;
 ConVar g_EnablePlayerOutlinesConVar;
 ConVar g_IgnoreRedPlayerDeathSwapConVar;
@@ -6642,6 +6643,10 @@ Action Timer_PlayerSwitchToBlue(Handle timer, any userid)
 		return Plugin_Stop;
 	}
 	if (g_IgnoreRedPlayerDeathSwapConVar.BoolValue)
+	{
+		return Plugin_Stop;
+	}
+	if (g_EscapeEliminationConVar.BoolValue && !(IsRoundInEscapeObjective() || g_RoundTime <= 0) && !SF_IsRenevantMap() && !SF_IsSlaughterRunMap() && !SF_IsBoxingMap())
 	{
 		return Plugin_Stop;
 	}
