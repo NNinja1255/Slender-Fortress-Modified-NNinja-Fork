@@ -8286,11 +8286,6 @@ void InitializeNewGame()
 	SelectStartingBossesForRound();
 
 	ForceInNextPlayersInQueue(GetMaxPlayersForRound());
-	
-	if (g_ForceLateJoinersConVar.BoolValue)
-	{
-		CreateTimer(1.0, Timer_ForceLateJoinersLoop, TIMER_REPEAT|TIMER_FLAG_NO_MAPCHANGE);
-	}
 
 	// Respawn all players, if needed.
 	for (int i = 1; i <= MaxClients; i++)
@@ -8385,6 +8380,11 @@ void InitializeNewGame()
 		DebugMessage("END InitializeNewGame()");
 	}
 	#endif
+	
+	if (g_ForceLateJoinersConVar.BoolValue)
+	{
+		CreateTimer(1.0, Timer_ForceLateJoinersLoop, TIMER_REPEAT|TIMER_FLAG_NO_MAPCHANGE);
+	}
 }
 
 Action Timer_ForceLateJoinersLoop(Handle timer)
