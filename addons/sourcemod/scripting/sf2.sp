@@ -8297,10 +8297,10 @@ void InitializeNewGame()
 				{
 					// Players currently in the "game" still have to be respawned.
 					TF2_RespawnPlayer(i);
-					SetEntPropFloat(i, Prop_Send, "m_flModelScale", 1.0);
-					SetEntPropFloat(i, Prop_Send, "m_flHeadScale", 1.0);
-					SetEntPropFloat(i, Prop_Send, "m_flTorsoScale", 1.0);
-					SetEntPropFloat(i, Prop_Send, "m_flHandScale", 1.0);
+					//SetEntPropFloat(i, Prop_Send, "m_flModelScale", 1.0);
+					//SetEntPropFloat(i, Prop_Send, "m_flHeadScale", 1.0);
+					//SetEntPropFloat(i, Prop_Send, "m_flTorsoScale", 1.0);
+					//SetEntPropFloat(i, Prop_Send, "m_flHandScale", 1.0);
 					Client_ModelOverrides(i);
 				}
 			}

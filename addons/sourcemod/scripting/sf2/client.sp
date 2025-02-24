@@ -1786,10 +1786,10 @@ Action Timer_RespawnPlayer(Handle timer, any userid)
 	}
 
 	TF2_RespawnPlayer(client);
-	SetEntPropFloat(client, Prop_Send, "m_flModelScale", 1.0);
-	SetEntPropFloat(client, Prop_Send, "m_flHeadScale", 1.0);
-	SetEntPropFloat(client, Prop_Send, "m_flTorsoScale", 1.0);
-	SetEntPropFloat(client, Prop_Send, "m_flHandScale", 1.0);
+	//SetEntPropFloat(client, Prop_Send, "m_flModelScale", 1.0);
+	//SetEntPropFloat(client, Prop_Send, "m_flHeadScale", 1.0);
+	//SetEntPropFloat(client, Prop_Send, "m_flTorsoScale", 1.0);
+	//SetEntPropFloat(client, Prop_Send, "m_flHandScale", 1.0);
 	Client_ModelOverrides(client);
 
 	return Plugin_Stop;
