@@ -560,6 +560,7 @@ ConVar g_DefaultBossTeamConVar;
 ConVar g_EngineerBuildInBLUConVar;
 ConVar g_ShowStaticMeterConVar;
 ConVar g_DisableTauntLoopsConVar;
+ConVar g_ForceLateJoinersConVar;
 
 ConVar g_RestartSessionConVar;
 bool g_RestartSessionEnabled;
@@ -8285,6 +8286,11 @@ void InitializeNewGame()
 	SelectStartingBossesForRound();
 
 	ForceInNextPlayersInQueue(GetMaxPlayersForRound());
+	
+	if (!g_ForceLateJoinersConVar.BoolValue)
+	{
+		CreateTimer(1.0, Timer_ForceLateJoinersLoop, TIMER_REPEAT|TIMER_FLAG_NO_MAPCHANGE);
+	}
 
 	// Respawn all players, if needed.
 	for (int i = 1; i <= MaxClients; i++)
@@ -8380,6 +8386,32 @@ void InitializeNewGame()
 	}
 	#endif
 }
+
+static Action Timer_ForceLateJoinersLoop(Handle timer)
+{
+	if (!g_Enabled)
+	{
+		return Plugin_Stop;
+	}
+	
+	if (!g_ForceLateJoinersConVar.BoolValue)
+	{
+		return Plugin_Stop;
+	}
+
+	if (GetRoundState() != SF2RoundState_Intro && GetRoundState() != SF2RoundState_Grace)
+	{
+		return Plugin_Stop;
+	}
+	
+	if ((GetMaxPlayersForRound() - GetActivePlayerCount()) > 0)
+	{
+		ForceInNextPlayersInQueue(GetMaxPlayersForRound() - GetActivePlayerCount());
+	}
+	
+	return Plugin_Continue;
+}
+
 
 static Action Timer_PlayIntroMusicToPlayer(Handle timer, any userid)
 {

@@ -245,6 +245,8 @@ public void OnPluginStart()
 	
 	g_ShowStaticMeterConVar = CreateConVar("sf2_show_static_meter", "0", "Displays the amount of static the player has received to the HUD.", _, true, 0.0, true, 1.0);
 	g_DisableTauntLoopsConVar = CreateConVar("sf2_disable_taunt_loop_sounds", "0", "Enables/Disables the ability for proxies and REDs to hear taunt sounds.", _, true, 0.0, true, 1.0);
+	
+	g_ForceLateJoinersConVar = CreateConVar("sf2_force_late_joiners", "0", "Continously checks for any players on BLU for anyone that didn't manage to make it in until grace period ends.", _, true, 0.0, true, 1.0);
 
 	g_MaxRoundsConVar = FindConVar("mp_maxrounds");
 
