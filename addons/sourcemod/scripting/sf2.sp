@@ -8387,7 +8387,7 @@ void InitializeNewGame()
 	#endif
 }
 
-static Action Timer_ForceLateJoinersLoop(Handle timer)
+Action Timer_ForceLateJoinersLoop(Handle timer)
 {
 	if (!g_Enabled)
 	{
@@ -8404,10 +8404,7 @@ static Action Timer_ForceLateJoinersLoop(Handle timer)
 		return Plugin_Stop;
 	}
 	
-	if ((GetMaxPlayersForRound() - GetActivePlayerCount()) > 0)
-	{
-		ForceInNextPlayersInQueue(GetMaxPlayersForRound() - GetActivePlayerCount());
-	}
+	ForceInNextPlayersInQueue(GetMaxPlayersForRound() - GetActivePlayerCount());
 	
 	return Plugin_Continue;
 }
