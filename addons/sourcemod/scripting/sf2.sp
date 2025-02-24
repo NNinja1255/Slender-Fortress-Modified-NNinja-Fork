@@ -8425,7 +8425,10 @@ Action Timer_ForceLateJoinersLoop(Handle timer)
 	}
 	#endif
 	
-	ForceInNextPlayersInQueue(GetMaxPlayersForRound() - GetActivePlayerCount());
+	if ((GetMaxPlayersForRound() - GetActivePlayerCount()) > 0)
+	{
+		ForceInNextPlayersInQueue(GetMaxPlayersForRound() - GetActivePlayerCount());
+	}
 	
 	return Plugin_Continue;
 }
