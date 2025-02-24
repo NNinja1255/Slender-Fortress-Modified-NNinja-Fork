@@ -8383,7 +8383,14 @@ void InitializeNewGame()
 	
 	if (g_ForceLateJoinersConVar.BoolValue)
 	{
-		CreateTimer(1.0, Timer_ForceLateJoinersLoop, TIMER_REPEAT|TIMER_FLAG_NO_MAPCHANGE);
+		CreateTimer(1.0, Timer_ForceLateJoinersLoop, _, TIMER_REPEAT|TIMER_FLAG_NO_MAPCHANGE);
+		
+		#if defined DEBUG
+		if (g_DebugDetailConVar.IntValue > 0)
+		{
+			DebugMessage("Started Late Joiners Loop");
+		}
+		#endif
 	}
 }
 
@@ -8401,8 +8408,22 @@ Action Timer_ForceLateJoinersLoop(Handle timer)
 
 	if (GetRoundState() != SF2RoundState_Intro && GetRoundState() != SF2RoundState_Grace)
 	{
+		#if defined DEBUG
+		if (g_DebugDetailConVar.IntValue > 0)
+		{
+			DebugMessage("Ended Late Joiners Loop");
+		}
+		#endif
+	
 		return Plugin_Stop;
 	}
+	
+	#if defined DEBUG
+	if (g_DebugDetailConVar.IntValue > 0)
+	{
+		DebugMessage("Late Joiners Loop Iteration");
+	}
+	#endif
 	
 	ForceInNextPlayersInQueue(GetMaxPlayersForRound() - GetActivePlayerCount());
 	
