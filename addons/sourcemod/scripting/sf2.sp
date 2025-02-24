@@ -8287,7 +8287,7 @@ void InitializeNewGame()
 
 	ForceInNextPlayersInQueue(GetMaxPlayersForRound());
 	
-	if (!g_ForceLateJoinersConVar.BoolValue)
+	if (g_ForceLateJoinersConVar.BoolValue)
 	{
 		CreateTimer(1.0, Timer_ForceLateJoinersLoop, TIMER_REPEAT|TIMER_FLAG_NO_MAPCHANGE);
 	}
