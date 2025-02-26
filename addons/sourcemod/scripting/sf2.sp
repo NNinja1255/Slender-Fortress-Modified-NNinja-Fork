@@ -8394,7 +8394,7 @@ void InitializeNewGame()
 	}
 }
 
-Action Timer_ForceLateJoinersLoop(Handle timer)
+static Action Timer_ForceLateJoinersLoop(Handle timer)
 {
 	if (!g_Enabled)
 	{
