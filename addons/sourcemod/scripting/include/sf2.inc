@@ -6,9 +6,12 @@
 #include <cbasenpc>
 #include <cbasenpc/util>
 #include <cbasenpc/matrix>
+#include <tf2>
+#include <tf2_stocks>
+#include <sdkhooks>
 
 #define PLUGIN_VERSION "1.8.0 M Alpha 2.7 F"
-#define PLUGIN_VERSION_DISPLAY "1.8.0 M Alpha 2.7 F"
+#define PLUGIN_VERSION_DISPLAY "1.8.0 M Alpha 2.73c F"
 
 // Some defines.
 #define SF2_MAX_PROFILE_NAME_LENGTH 64
@@ -541,7 +544,6 @@ forward Action SF2_OnBossPreTakeDamage(SF2_ChaserBossEntity chaser, CBaseEntity 
  */
 forward Action SF2_OnBossPreFlashlightDamage(SF2_ChaserBossEntity chaser, SF2_Player player);
 
-
 /**
  * Called whenever a chaser boss gets a command string "suspend for action" using INextBotEventResponder.OnCommandString()
  *
@@ -1026,6 +1028,7 @@ native bool SF2_IsClientUbercharged(int client);
  */
 native bool SF2_IsClientInKart(int client);
 
+#if defined _tf2_included
 /**
  * Returns whether or not the client is in a specific condition for SF2.
  *
@@ -1034,6 +1037,7 @@ native bool SF2_IsClientInKart(int client);
  * @return				True if the player is in a condition, false if not.
  */
 native bool SF2_IsClientInCondition(int client, TFCond condition);
+#endif
 
 /**
  * Returns a bool about the client's elimination state.
@@ -2375,6 +2379,7 @@ methodmap SF2_Player < CBaseCombatCharacter
 	 */
 	public native int GetDataEnt(int offset);
 
+	#if defined _tf2_stocks_included
 	/**
 	 * Alias of TF2_GetPlayerClass()
 	 */
@@ -2382,6 +2387,7 @@ methodmap SF2_Player < CBaseCombatCharacter
 	{
 		public native get();
 	}
+	#endif
 
 	/**
 	 * Alias of GetClientTeam()
@@ -2401,6 +2407,7 @@ methodmap SF2_Player < CBaseCombatCharacter
 		public native set(bool state);
 	}
 
+	#if defined _tf2_included
 	/**
 	 * Alias of TF2_IsPlayerInCondition()
 	 * Use this over TF2_IsPlayerInCondition() though as it has extra optimizations
@@ -2418,6 +2425,7 @@ methodmap SF2_Player < CBaseCombatCharacter
 	 * @param inflictor		Inflictor of the condition
 	 */
 	public native bool ChangeCondition(TFCond condition, bool remove = false, float duration = -1.0, int inflictor = 0);
+	#endif
 
 	/**
 	 * Whether or not the client is crit boosted
