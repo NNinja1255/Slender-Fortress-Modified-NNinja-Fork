@@ -50,7 +50,7 @@ bool steamworks;
 public Plugin myinfo =
 {
 	name = "Slender Fortress Modified",
-	author = "KitRifty, Kenzzer, Mentrillum, The Gaben",
+	author = "KitRifty, Kenzzer, Mentrillum, The Gaben (forked by NNinja1255)",
 	description = "Based on the game Slender: The Eight Pages.",
 	version = PLUGIN_VERSION,
 	url = "https://discord.gg/7Zz7RYTCC4"
@@ -2224,7 +2224,7 @@ static Action Timer_RoundMessages(Handle timer)
 	{
 		case 0:
 		{
-			CPrintToChatAll("{royalblue}== {violet}Slender Fortress{royalblue} coded by {hotpink}KitRifty & Kenzzer{royalblue}==\n== Modified by {deeppink}Mentrillum & The Gaben{royalblue}, current version {violet}%s{royalblue}==", PLUGIN_VERSION_DISPLAY);
+			CPrintToChatAll("{royalblue}== {violet}Slender Fortress{royalblue} coded by {hotpink}KitRifty & Kenzzer{royalblue}==\n== Modified by {deeppink}Mentrillum & The Gaben{royalblue}, Forked by {red}NNinja1255{royalblue}, current version {violet}%s{royalblue}==", PLUGIN_VERSION_DISPLAY);
 		}
 		case 1:
 		{
