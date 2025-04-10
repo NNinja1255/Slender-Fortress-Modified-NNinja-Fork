@@ -2370,8 +2370,8 @@ void OnConVarChanged(Handle cvar, const char[] oldValue, const char[] intValue)
 	{
 		if (g_RestartSessionConVar.BoolValue)
 		{
-			ArrayList selectableBossesAdmin = GetSelectableAdminBossProfileList().Clone();
-			ArrayList selectableBosses = GetSelectableBossProfileList().Clone();
+			ArrayList selectableBossesAdmin = GetSelectableAdminBossProfileList();
+			ArrayList selectableBosses = GetSelectableBossProfileList();
 			PlayNightmareSound();
 			SpecialRoundGameText("Its Restart Session time!", "leaderboard_streak");
 			CPrintToChatAll("{royalblue}%t {default}Your thirst for blood continues? Very well, let the blood spill. Let the demons feed off your unfortunate soul... Difficulty set to {mediumslateblue}%t!", "SF2 Prefix", "SF2 Calamity Difficulty");
@@ -2465,8 +2465,6 @@ void OnConVarChanged(Handle cvar, const char[] oldValue, const char[] intValue)
 				}
 				delete spawnPoint;
 			}
-			delete selectableBosses;
-			delete selectableBossesAdmin;
 		}
 		else
 		{
@@ -3089,7 +3087,7 @@ void CollectPage(int page, int activator)
 		{
 			if (g_DifficultyConVar.IntValue < 4 || GetSelectableAdminBossProfileList().Length <= 0)
 			{
-				ArrayList selectableBosses = GetSelectableBossProfileList().Clone();
+				ArrayList selectableBosses = GetSelectableBossProfileList();
 				if (selectableBosses.Length > 0)
 				{
 					selectableBosses.GetString(GetRandomInt(0, selectableBosses.Length - 1), buffer, sizeof(buffer));
@@ -3099,11 +3097,10 @@ void CollectPage(int page, int activator)
 					SpecialRoundGameText(bossName, "d_purgatory");
 					CPrintToChatAll("{royalblue}%t {default}Next on the roulette: {valve}%s", "SF2 Prefix", bossName); //Minimized HUD
 				}
-				delete selectableBosses;
 			}
 			else
 			{
-				ArrayList selectableBosses = GetSelectableAdminBossProfileList().Clone();
+				ArrayList selectableBosses = GetSelectableAdminBossProfileList();
 				if (selectableBosses.Length > 0)
 				{
 					selectableBosses.GetString(GetRandomInt(0, selectableBosses.Length - 1), buffer, sizeof(buffer));
@@ -3113,7 +3110,6 @@ void CollectPage(int page, int activator)
 					SpecialRoundGameText(bossName, "d_purgatory");
 					CPrintToChatAll("{royalblue}%t {default}Next on the roulette: {valve}%s", "SF2 Prefix", bossName);
 				}
-				delete selectableBosses;
 			}
 		}
 		else
@@ -5275,13 +5271,12 @@ void SetPageCount(int num)
 			if (SF_SpecialRound(SPECIALROUND_LASTRESORT))
 			{
 				char buffer[SF2_MAX_PROFILE_NAME_LENGTH];
-				ArrayList selectableBosses = GetSelectableBossProfileList().Clone();
+				ArrayList selectableBosses = GetSelectableBossProfileList();
 				if (selectableBosses.Length > 0)
 				{
 					selectableBosses.GetString(GetRandomInt(0, selectableBosses.Length - 1), buffer, sizeof(buffer));
 					AddProfile(buffer);
 				}
-				delete selectableBosses;
 			}
 		}
 		else
@@ -7889,7 +7884,7 @@ static void HandleNewBossRoundState()
 	// Check if we have enough bosses.
 	if (g_NewBossRound)
 	{
-		ArrayList bossList = GetNewBossRoundProfileList().Clone();
+		ArrayList bossList = GetNewBossRoundProfileList();
 
 		if (bossList.Length < 1)
 		{
@@ -7964,7 +7959,7 @@ static void SelectStartingBossesForRound()
 	}
 	#endif
 
-	ArrayList selectableBossList = GetSelectableBossProfileQueueList().Clone();
+	ArrayList selectableBossList = GetSelectableBossProfileQueueList();
 
 	// Select which boss profile to use.
 	char profileOverride[SF2_MAX_PROFILE_NAME_LENGTH];
@@ -8074,7 +8069,6 @@ static void SelectStartingBossesForRound()
 		}
 		#endif
 	}
-	delete selectableBossList;
 }
 
 static void GetRoundIntroParameters()
@@ -8363,13 +8357,12 @@ void InitializeNewGame()
 			else if (SF_IsBoxingMap())
 			{
 				char buffer[SF2_MAX_PROFILE_NAME_LENGTH];
-				ArrayList selectableBosses = GetSelectableBoxingBossProfileList().Clone();
+				ArrayList selectableBosses = GetSelectableBoxingBossProfileList();
 				if (selectableBosses.Length > 0)
 				{
 					selectableBosses.GetString(GetRandomInt(0, selectableBosses.Length - 1), buffer, sizeof(buffer));
 					AddProfile(buffer);
 				}
-				delete selectableBosses;
 			}
 		}
 	}
@@ -8656,13 +8649,12 @@ static Action Timer_ActivateRoundFromIntro(Handle timer)
 		else if (SF_IsBoxingMap())
 		{
 			char buffer[SF2_MAX_PROFILE_NAME_LENGTH];
-			ArrayList selectableBosses = GetSelectableBoxingBossProfileList().Clone();
+			ArrayList selectableBosses = GetSelectableBoxingBossProfileList();
 			if (selectableBosses.Length > 0)
 			{
 				selectableBosses.GetString(GetRandomInt(0, selectableBosses.Length - 1), buffer, sizeof(buffer));
 				AddProfile(buffer);
 			}
-			delete selectableBosses;
 		}
 	}
 	return Plugin_Stop;

@@ -11,7 +11,7 @@
 #include <sdkhooks>
 
 #define PLUGIN_VERSION "1.8.0 M Alpha 2.7 F"
-#define PLUGIN_VERSION_DISPLAY "1.8.0 M Alpha 2.73c F"
+#define PLUGIN_VERSION_DISPLAY "1.8.0 M Alpha 2.73d F"
 
 // Some defines.
 #define SF2_MAX_PROFILE_NAME_LENGTH 64
