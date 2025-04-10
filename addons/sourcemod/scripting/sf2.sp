@@ -2224,7 +2224,7 @@ static Action Timer_RoundMessages(Handle timer)
 	{
 		case 0:
 		{
-			CPrintToChatAll("{royalblue}== {violet}Slender Fortress{royalblue} coded by {hotpink}KitRifty & Kenzzer{royalblue}==\n== Modified by {deeppink}Mentrillum & The Gaben{royalblue}, Forked by {red}NNinja1255{royalblue}, current version {violet}%s{royalblue}==", PLUGIN_VERSION_DISPLAY);
+			CPrintToChatAll("{royalblue}== {violet}Slender Fortress{royalblue} coded by {hotpink}KitRifty & Kenzzer{royalblue}==\n== Modified by {deeppink}Mentrillum & The Gaben{royalblue}==\n== Forked by {red}NNinja1255{royalblue}, current version {violet}%s{royalblue}==", PLUGIN_VERSION_DISPLAY);
 		}
 		case 1:
 		{
