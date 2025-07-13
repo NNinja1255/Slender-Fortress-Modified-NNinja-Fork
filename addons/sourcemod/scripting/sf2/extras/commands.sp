@@ -134,7 +134,7 @@ public void OnPluginStart()
 	g_GhostModeConnectionCheckConVar = CreateConVar("sf2_ghostmode_check_connection", "1", "Checks a player's connection while in Ghost Mode. If the check fails, the client is booted out of Ghost Mode and the action and client's SteamID is logged in the main SF2 log.");
 	g_GhostModeConnectionToleranceConVar = CreateConVar("sf2_ghostmode_connection_tolerance", "5.0", "If sf2_ghostmode_check_connection is set to 1 and the client has timed out for at least this amount of time, the client will be booted out of Ghost Mode.");
 	g_GhostModeVisibleConVar = CreateConVar("sf2_ghostmode_visible", "1", "0 = not visible at all, 1 = visible to only other ghosts, 2 = visible to all players (In-game players can only see particles)",_, true, 0.0, true, 2.0);
-	g_GhostModeVisibleAlphaConVar = CreateConVar("sf2_ghostmode_visible_alpha", "255", "The alpha of the render color for ghosts models. (Particles will be unaffected)",_, true, 0.0, true, 255.0);
+	g_GhostModeVisibleAlphaConVar = CreateConVar("sf2_ghostmode_visible_alpha", "0", "The alpha of the render color for ghosts models. (Particles will be unaffected)",_, true, 0.0, true, 255.0);
 
 	g_MaxPlayersConVar = CreateConVar("sf2_maxplayers", "6", "The maximum amount of players that can be in one round.", _, true, 1.0);
 	g_MaxPlayersConVar.AddChangeHook(OnConVarChanged);
