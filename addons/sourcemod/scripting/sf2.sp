@@ -4012,7 +4012,7 @@ void SetRoundState(SF2RoundState roundState)
 				delete spawnPoint;
 			}
 
-			if (g_EscapeEliminationConVar.BoolValue && !SF_IsRenevantMap() && !SF_IsSlaughterRunMap() && !SF_IsBoxingMap())
+			if (g_EscapeEliminationConVar.BoolValue && !SF_SpecialRound(SPECIALROUND_1UP) && !SF_IsRenevantMap() && !SF_IsSlaughterRunMap() && !SF_IsBoxingMap())
 			{
 				CPrintToChatAll("{dodgerblue}%t", "SF2 Grace Period End Alt");
 			}
@@ -4183,7 +4183,7 @@ void SetRoundState(SF2RoundState roundState)
 				Renevant_SetWave(1, true);
 			}
 			
-			if (g_EscapeEliminationConVar.BoolValue && !SF_IsRenevantMap() && !SF_IsSlaughterRunMap() && !SF_IsBoxingMap())
+			if (g_EscapeEliminationConVar.BoolValue && !SF_SpecialRound(SPECIALROUND_1UP) && !SF_IsRenevantMap() && !SF_IsSlaughterRunMap() && !SF_IsBoxingMap())
 			{
 				for (int i = 1; i <= MaxClients; i++)
 				{
@@ -4196,10 +4196,7 @@ void SetRoundState(SF2RoundState roundState)
 						}
 					}
 				}
-			}
-			
-			if (g_EscapeEliminationConVar.BoolValue && !SF_IsRenevantMap() && !SF_IsSlaughterRunMap() && !SF_IsBoxingMap())
-			{
+				
 				CPrintToChatAll("{dodgerblue}%t", "SF2 Escape Elimination");
 			}
 		}
@@ -6611,7 +6608,7 @@ Action Timer_PlayerSwitchToBlue(Handle timer, any userid)
 	{
 		return Plugin_Stop;
 	}
-	if (g_EscapeEliminationConVar.BoolValue && !(IsRoundInEscapeObjective() || IsRoundEnding() || g_RoundTime <= 0) && !SF_IsRenevantMap() && !SF_IsSlaughterRunMap() && !SF_IsBoxingMap())
+	if (g_EscapeEliminationConVar.BoolValue && !SF_SpecialRound(SPECIALROUND_1UP) && !(IsRoundInEscapeObjective() || IsRoundEnding() || g_RoundTime <= 0) && !SF_IsRenevantMap() && !SF_IsSlaughterRunMap() && !SF_IsBoxingMap())
 	{
 		return Plugin_Stop;
 	}
