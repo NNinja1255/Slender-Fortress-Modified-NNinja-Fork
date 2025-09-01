@@ -2800,7 +2800,7 @@ void SpawnSlender(SF2NPC_BaseNPC Npc, const float pos[3])
 
 	GetSlenderModel(bossIndex, _, buffer, sizeof(buffer));
 
-	CBaseNPC npcBoss = CBaseNPC();
+	CBaseNPC npcBoss = new CBaseNPC();
 	CBaseCombatCharacter npcEntity = CBaseCombatCharacter(npcBoss.GetEntity());
 	CBaseNPC_Locomotion locomotion = npcBoss.GetLocomotion();
 	npcEntity.Hook_HandleAnimEvent(CBaseAnimating_HandleAnimEvent);
@@ -5405,4 +5405,5 @@ bool SpawnProxy(int client, int bossIndex, float teleportPos[3], int &spawnPoint
 }
 
 #include "sf2/npc/npc_chaser.sp"
+
 #include "sf2/npc/npc_chaser_takedamage.sp"
