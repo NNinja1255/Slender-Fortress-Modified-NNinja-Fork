@@ -4015,6 +4015,7 @@ void SetRoundState(SF2RoundState roundState)
 			if (g_EscapeEliminationConVar.BoolValue && !SF_SpecialRound(SPECIALROUND_1UP) && !SF_IsRenevantMap() && !SF_IsSlaughterRunMap() && !SF_IsBoxingMap())
 			{
 				CPrintToChatAll("{dodgerblue}%t", "SF2 Grace Period End Alt");
+				CPrintToChatAll("{dodgerblue}%t", "SF2 Grace Period End Alt 2");
 			}
 			else
 			{

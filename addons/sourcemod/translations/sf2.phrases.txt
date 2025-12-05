@@ -205,9 +205,15 @@
 
 	}
 
+	"SF2 Grace Period End Alt 2"
+	{
+		"en"	"You can switch teams at any time. If no one is on RED, the round will immediately end."
+
+	}
+
 	"SF2 Escape Elimination"
 	{
-		"en"	"Escape phase started. Death will now result in elimination."
+		"en"	"Escape phase started. Death and team switch will now result in elimination."
 
 	}
 
