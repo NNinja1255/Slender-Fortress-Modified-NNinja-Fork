@@ -561,6 +561,7 @@ ConVar g_EngineerBuildInBLUConVar;
 ConVar g_ShowStaticMeterConVar;
 ConVar g_DisableTauntLoopsConVar;
 ConVar g_ForceLateJoinersConVar;
+ConVar g_BossPreviewWikiConVar;
 
 ConVar g_RestartSessionConVar;
 bool g_RestartSessionEnabled;
@@ -650,6 +651,8 @@ GlobalForward g_OnDifficultyVoteFinishedFwd;
 GlobalForward g_OnIsBossCustomAttackPossibleFwd;
 GlobalForward g_OnBossGetCustomAttackActionFwd;
 GlobalForward g_OnProjectileTouchFwd;
+GlobalForward g_OnPreSelectStartingBosses;
+GlobalForward g_OnPostSelectStartingBosses;
 
 // Private forwards
 PrivateForward g_OnGamemodeStartPFwd;
@@ -666,6 +669,7 @@ PrivateForward g_OnAdminMenuCreateOptionsPFwd;
 PrivateForward g_OnPlayerJumpPFwd;
 PrivateForward g_OnPlayerSpawnPFwd;
 PrivateForward g_OnPlayerTakeDamagePFwd;
+PrivateForward g_OnPlayerTakeDamagePostPFwd;
 PrivateForward g_OnPlayerDeathPrePFwd;
 PrivateForward g_OnPlayerDeathPFwd;
 PrivateForward g_OnPlayerPutInServerPFwd;
@@ -773,6 +777,7 @@ ArrayList g_PageLocationsGlow;
 #include "sf2/extras/commands.sp"
 #include "sf2/extras/game_events.sp"
 #include "sf2/extras/afk_mode.sp"
+#include "sf2/extras/bosspreview.sp"
 
 SF2LogicRenevantEntity g_RenevantLogicEntity = view_as<SF2LogicRenevantEntity>(-1);
 
@@ -930,7 +935,6 @@ public void OnConfigsExecuted()
 							continue;
 						}
 						g_ClientInGame[i] = true;
-						SDKHook(i, SDKHook_OnTakeDamage, Hook_ClientOnTakeDamage);
 						Call_StartForward(g_OnPlayerPutInServerPFwd);
 						Call_PushCell(SF2_BasePlayer(i));
 						Call_Finish();
@@ -1085,6 +1089,7 @@ static void StartPlugin()
 	ReloadClassConfigs();
 
 	NPCOnConfigsExecuted();
+	BossPreview_ReloadPack();
 
 	InitializeBossPackVotes();
 	SetupTimeLimitTimerForBossPackVote();
@@ -2376,7 +2381,7 @@ void OnConVarChanged(Handle cvar, const char[] oldValue, const char[] intValue)
 			SpecialRoundGameText("Its Restart Session time!", "leaderboard_streak");
 			CPrintToChatAll("{royalblue}%t {default}Your thirst for blood continues? Very well, let the blood spill. Let the demons feed off your unfortunate soul... Difficulty set to {mediumslateblue}%t!", "SF2 Prefix", "SF2 Calamity Difficulty");
 			g_RestartSessionEnabled = true;
-			g_DifficultyConVar.SetInt(Difficulty_Apollyon);
+			SetDifficulty(Difficulty_Apollyon);
 			g_IgnoreRoundWinConditionsConVar.SetBool(true);
 			g_IgnoreRedPlayerDeathSwapConVar.SetBool(true);
 			g_BossChaseEndlesslyConVar.SetBool(true);
@@ -2470,7 +2475,7 @@ void OnConVarChanged(Handle cvar, const char[] oldValue, const char[] intValue)
 		{
 			CPrintToChatAll("{royalblue}%t {default}You're done? Ok. Difficulty set to {darkgray}Apollyon.", "SF2 Prefix");
 			g_RestartSessionEnabled = false;
-			g_DifficultyConVar.SetInt(Difficulty_Apollyon);
+			SetDifficulty(Difficulty_Apollyon);
 			g_IgnoreRoundWinConditionsConVar.SetBool(false);
 			g_IgnoreRedPlayerDeathSwapConVar.SetBool(false);
 			g_BossChaseEndlesslyConVar.SetBool(false);
@@ -3621,7 +3626,6 @@ public void OnClientPutInServer(int client)
 	{
 		if (g_LoadOutsideMapsConVar.BoolValue)
 		{
-			SDKHook(client, SDKHook_OnTakeDamage, Hook_ClientOnTakeDamage);
 			Call_StartForward(g_OnPlayerPutInServerPFwd);
 			Call_PushCell(SF2_BasePlayer(client));
 			Call_Finish();
@@ -3665,7 +3669,6 @@ public void OnClientPutInServer(int client)
 	SDKHook(client, SDKHook_PreThink, Hook_ClientPreThink);
 	SDKHook(client, SDKHook_PreThinkPost, Hook_OnFlashlightThink);
 	SDKHook(client, SDKHook_SetTransmit, Hook_ClientSetTransmit);
-	SDKHook(client, SDKHook_OnTakeDamage, Hook_ClientOnTakeDamage);
 
 	g_DHookWantsLagCompensationOnEntity.HookEntity(Hook_Pre, client, Hook_ClientWantsLagCompensationOnEntity);
 
@@ -3821,7 +3824,7 @@ public void OnClientDisconnect(int client)
 		CreateTimer(0.2, Timer_CheckAlivePlayers, _, TIMER_FLAG_NO_MAPCHANGE);
 	}
 
-	if (!IsRoundInWarmup())
+	if (!IsRoundInWarmup() && GameRules_GetRoundState() != RoundState_TeamWin)
 	{
 		if (g_PlayerPlaying[client] && !g_PlayerEliminated[client])
 		{
@@ -3846,6 +3849,7 @@ public void OnClientDisconnect(int client)
 	g_PlayerQueuePoints[client] = 0;
 
 	AFK_SetTime(client, false);
+	BossPreview_Remove(client);
 
 	Call_StartForward(g_OnPlayerDisconnectedPFwd);
 	Call_PushCell(SF2_BasePlayer(client));
@@ -4056,7 +4060,7 @@ void SetRoundState(SF2RoundState roundState)
 			g_Renevant90sEffect = false;
 			g_RenevantMarkForDeath = false;
 			g_RenevantBossesChaseEndlessly = false;
-			g_DifficultyConVar.SetInt(Difficulty_Normal);
+			SetDifficulty(Difficulty_Normal);
 			if (g_RestartSessionConVar.BoolValue)
 			{
 				g_RestartSessionEnabled = false;
@@ -7957,6 +7961,9 @@ static void SelectStartingBossesForRound()
 	}
 	#endif
 
+	Call_StartForward(g_OnPreSelectStartingBosses);
+	Call_Finish();
+
 	ArrayList selectableBossList = GetSelectableBossProfileQueueList();
 
 	// Select which boss profile to use.
@@ -8278,6 +8285,10 @@ void InitializeNewGame()
 	SelectStartingBossesForRound();
 
 	ForceInNextPlayersInQueue(GetMaxPlayersForRound());
+
+	Call_StartForward(g_OnPostSelectStartingBosses);
+	Call_PushStringEx(g_RoundBossProfile, sizeof(g_RoundBossProfile), SM_PARAM_STRING_COPY, SM_PARAM_COPYBACK);
+	Call_Finish();
 
 	// Respawn all players, if needed.
 	for (int i = 1; i <= MaxClients; i++)
@@ -8721,4 +8732,18 @@ void CheckRoundWinConditions()
 			}
 		}
 	}
+}
+
+// Fixes setting the same difficulty not calling our forwards
+void SetDifficulty(int difficulty)
+{
+	char last[16], newDiff[16];
+	g_DifficultyConVar.GetString(last, sizeof(last));
+	IntToString(difficulty, newDiff, sizeof(newDiff));
+	if (strcmp(last, newDiff, false) == 0)
+	{
+		StrCat(newDiff, sizeof(newDiff), " ");
+	}
+
+	g_DifficultyConVar.SetString(newDiff);
 }

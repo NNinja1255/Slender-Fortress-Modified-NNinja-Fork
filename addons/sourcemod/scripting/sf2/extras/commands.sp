@@ -248,6 +248,8 @@ public void OnPluginStart()
 	
 	g_ForceLateJoinersConVar = CreateConVar("sf2_force_late_joiners", "0", "Continously checks for any players on BLU for anyone that didn't manage to make it in until grace period ends.", _, true, 0.0, true, 1.0);
 
+	g_BossPreviewWikiConVar = CreateConVar("sf2_bosspreview_wikiurl", "", "The url format to show the wiki (%s for the boss name)");
+
 	g_MaxRoundsConVar = FindConVar("mp_maxrounds");
 
 	g_HudSync = CreateHudSynchronizer();
@@ -300,8 +302,8 @@ public void OnPluginStart()
 	RegConsoleCmd("sm_sltuto", Command_Tutorial);
 	RegConsoleCmd("sm_sf2tutorial", Command_Tutorial);
 	RegConsoleCmd("sm_sf2tuto", Command_Tutorial);
-	RegConsoleCmd("sm_slpack", Command_Pack);
-	RegConsoleCmd("sm_sf2pack", Command_Pack);
+	RegConsoleCmd("sm_slpack", BossPreview_MainMenu);
+	RegConsoleCmd("sm_sf2pack", BossPreview_MainMenu);
 	RegConsoleCmd("sm_slnextpack", Command_NextPack);
 	RegConsoleCmd("sm_sf2nextpack", Command_NextPack);
 	RegConsoleCmd("sm_slnext", Command_Next);
@@ -311,8 +313,15 @@ public void OnPluginStart()
 	RegConsoleCmd("sm_slhelp", Command_Help);
 	RegConsoleCmd("sm_slsettings", Command_Settings);
 	RegConsoleCmd("sm_slcredits", Command_Credits);
-	RegConsoleCmd("sm_slviewbosslist", Command_BossList);
-	RegConsoleCmd("sm_slbosslist", Command_BossList);
+	RegConsoleCmd("sm_slviewbosslist", BossPreview_MainMenu);
+	RegConsoleCmd("sm_slbosslist", BossPreview_MainMenu);
+	RegConsoleCmd("sm_slpacks", BossPreview_MainMenu, "", FCVAR_HIDDEN);
+	RegConsoleCmd("sm_sf2packs", BossPreview_MainMenu, "", FCVAR_HIDDEN);
+	RegConsoleCmd("sm_sf2viewbosslist", BossPreview_MainMenu, "", FCVAR_HIDDEN);
+	RegConsoleCmd("sm_sf2bosslist", BossPreview_MainMenu, "", FCVAR_HIDDEN);
+	RegConsoleCmd("sm_bosslist", BossPreview_MainMenu, "", FCVAR_HIDDEN);
+	RegConsoleCmd("sm_listboss", BossPreview_MainMenu, "", FCVAR_HIDDEN);
+	RegConsoleCmd("sm_bosspack", BossPreview_MainMenu, "", FCVAR_HIDDEN);
 	RegConsoleCmd("sm_slafk", Command_NoPoints);
 	RegConsoleCmd("sm_flashlight", Command_ToggleFlashlight);
 	RegConsoleCmd("sm_slhud", Command_MenuSwitchHud);
@@ -366,6 +375,7 @@ public void OnPluginStart()
 	RegAdminCmd("sm_sf2_wall_hax", Command_WallHax, ADMFLAG_SLAY);
 	RegAdminCmd("sm_sf2_keep_weapons", Command_KeepWeapons, ADMFLAG_SLAY);
 	RegAdminCmd("sm_sf2_reveal_page_locations", Command_RevealPageLocations, ADMFLAG_CHEATS);
+	RegAdminCmd("sm_sf2_set_modboss", Command_BossOverride, ADMFLAG_SLAY);
 	RegAdminCmd("+alltalk", Command_AllTalkOn, ADMFLAG_SLAY);
 	RegAdminCmd("-alltalk", Command_AllTalkOff, ADMFLAG_SLAY);
 	RegAdminCmd("+slalltalk", Command_AllTalkOn, ADMFLAG_SLAY, _, _, FCVAR_HIDDEN);
@@ -432,6 +442,7 @@ public void OnPluginStart()
 	g_OnPlayerJumpPFwd = new PrivateForward(ET_Ignore, Param_Cell);
 	g_OnPlayerSpawnPFwd = new PrivateForward(ET_Ignore, Param_Cell);
 	g_OnPlayerTakeDamagePFwd = new PrivateForward(ET_Hook, Param_Cell, Param_CellByRef, Param_CellByRef, Param_FloatByRef, Param_CellByRef);
+	g_OnPlayerTakeDamagePostPFwd = new PrivateForward(ET_Ignore, Param_Cell, Param_Cell, Param_Cell, Param_Float, Param_Cell);
 	g_OnPlayerDeathPrePFwd = new PrivateForward(ET_Ignore, Param_Cell, Param_Cell, Param_Cell, Param_Cell);
 	g_OnPlayerDeathPFwd = new PrivateForward(ET_Ignore, Param_Cell, Param_Cell, Param_Cell, Param_Cell);
 	g_OnPlayerPutInServerPFwd = new PrivateForward(ET_Ignore, Param_Cell);
@@ -480,6 +491,8 @@ public void OnPluginStart()
 	InitializeChangelog();
 
 	InitializeEffects();
+
+	SetupClients();
 
 	SetupAntiCamping();
 	SetupBlink();
@@ -641,17 +654,6 @@ static Action Command_Credits(int client, int args)
 	}
 
 	g_MenuCredits.Display(client, MENU_TIME_FOREVER);
-	return Plugin_Handled;
-}
-
-static Action Command_BossList(int client, int args)
-{
-	if (!g_Enabled)
-	{
-		return Plugin_Continue;
-	}
-
-	DisplayBossList(client);
 	return Plugin_Handled;
 }
 
@@ -2129,7 +2131,7 @@ static Action Command_ForceDifficulty(int client, int args)
 	}
 	else if (newDifficulty > Difficulty_Easy && newDifficulty < Difficulty_Max)
 	{
-		g_DifficultyConVar.SetInt(newDifficulty);
+		SetDifficulty(newDifficulty);
 	}
 
 	switch (newDifficulty)
