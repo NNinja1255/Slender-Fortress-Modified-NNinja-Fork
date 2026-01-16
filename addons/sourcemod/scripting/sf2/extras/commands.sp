@@ -1789,6 +1789,7 @@ static Action Command_ReloadProfiles(int client, int args)
 		ReloadRestrictedWeapons();
 		ReloadSpecialRounds();
 		ReloadClassConfigs();
+		BossPreview_ReloadPack();
 	}
 
 	for (int i = 0; i < MAX_BOSSES; i++)
