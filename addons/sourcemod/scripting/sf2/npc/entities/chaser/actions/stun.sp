@@ -1,4 +1,5 @@
 #pragma semicolon 1
+#pragma newdecls required
 
 static NextBotActionFactory g_Factory;
 
@@ -59,6 +60,7 @@ static NextBotAction InitialContainedAction(SF2_ChaserStunnedAction action, SF2_
 	INextBot bot = actor.MyNextBotPointer();
 	ILocomotion loco = bot.GetLocomotionInterface();
 	data = baseController.GetProfileData();
+	BaseBossProfile profileData = actor.Controller.GetProfileDataEx();
 	char animName[64];
 	float rate = 1.0, duration = 0.0, cycle = 0.0;
 	int difficulty = baseController.Difficulty;
@@ -78,6 +80,15 @@ static NextBotAction InitialContainedAction(SF2_ChaserStunnedAction action, SF2_
 	actor.PerformVoice(SF2BossSound_Stun);
 
 	actor.EndCloak();
+
+	if (baseController.TeleportType == SF2BossTeleportType_Vanisher)
+	{
+		BossProfileTeleportVanishingData vanishingData = profileData.GetVanishingData();
+		if (vanishingData != null)
+		{
+			g_SlenderTimeUntilKill[baseController.Index] += vanishingData.GetAddTimeOnAttack(difficulty);
+		}
+	}
 
 	if (data.AnimationData.GetAnimation(g_SlenderAnimationsList[SF2BossAnimation_Stun], difficulty, animName, sizeof(animName), rate, duration, cycle))
 	{
@@ -106,20 +117,20 @@ static int OnStart(SF2_ChaserStunnedAction action, SF2_ChaserEntity actor, NextB
 		SlenderSpawnEffects(data.StunData.StartEffects, controller.Index, false, pos, ang, _, _, true);
 	}
 
-	if (data.KeyDrop)
+	if (data.StunData.KeyDrop)
 	{
 		if (SF_IsBoxingMap() && data.StunData.Disappear[difficulty] && data.BoxingBoss && !g_SlenderBoxingBossIsKilled[controller.Index] && !view_as<SF2NPC_BaseNPC>(controller).GetProfileData().IsPvEBoss)
 		{
 			g_SlenderBoxingBossKilled++;
 			if ((g_SlenderBoxingBossKilled == g_SlenderBoxingBossCount))
 			{
-				NPC_DropKey(controller.Index, data.KeyModel, data.KeyTrigger);
+				NPC_DropKey(controller.Index, data.StunData.KeyModel, data.StunData.KeyTrigger);
 			}
 			g_SlenderBoxingBossIsKilled[controller.Index] = true;
 		}
 		else
 		{
-			NPC_DropKey(controller.Index, data.KeyModel, data.KeyTrigger);
+			NPC_DropKey(controller.Index, data.StunData.KeyModel, data.StunData.KeyTrigger);
 		}
 	}
 
@@ -197,6 +208,7 @@ static int OnSuspend(SF2_ChaserStunnedAction action, SF2_ChaserEntity actor, Nex
 
 static void OnEnd(SF2_ChaserStunnedAction action, SF2_ChaserEntity actor)
 {
+	actor.MyNextBotPointer().GetLocomotionInterface().ClearStuckStatus();
 	SF2NPC_Chaser controller = actor.Controller;
 
 	if (!controller.IsValid())

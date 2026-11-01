@@ -5,6 +5,7 @@
 #define _sf2_menus
 
 #pragma semicolon 1
+#pragma newdecls required
 
 Menu g_MenuMain;
 Menu g_MenuVoteDifficulty;
@@ -24,6 +25,7 @@ Menu g_MenuCredits2;
 Menu g_MenuCredits3;
 Menu g_MenuCredits4;
 Menu g_MenuCredits5;
+Menu g_MenuCredits6;
 
 static ArrayList g_Voters;
 static bool g_IsRunOff;
@@ -56,6 +58,8 @@ void SetupMenus()
 	strcopy(buffer, sizeof(buffer), "Credits (!slcredits)");
 	g_MenuMain.AddItem("0", buffer);
 	FormatEx(buffer, sizeof(buffer), "%t (!slbosslist)", "SF2 Boss View On List Title");
+	g_MenuMain.AddItem("0", buffer);
+	FormatEx(buffer, sizeof(buffer), "Show all special rounds: (!slspecial)");
 	g_MenuMain.AddItem("0", buffer);
 
 	g_MenuHelp = new Menu(Menu_Help);
@@ -149,10 +153,14 @@ void SetupMenus()
 	g_MenuSettings.AddItem("0", buffer);
 	FormatEx(buffer, sizeof(buffer), "%t", "SF2 Settings PvE Menu Title");
 	g_MenuSettings.AddItem("0", buffer);
+	FormatEx(buffer, sizeof(buffer), "Extended Special Round Descriptions");
+	g_MenuSettings.AddItem("0", buffer);
+	FormatEx(buffer, sizeof(buffer), "Set Flashlight Types");
+	g_MenuSettings.AddItem("0", buffer);
 	g_MenuSettings.ExitBackButton = true;
 
 	g_MenuSettingsFlashlightTemp1 = new Menu(Menu_Settings_Flashlighttemp1);
-	FormatEx(buffer, sizeof(buffer), "%t", "SF2 Settings Flashlight Temperature Title");
+	FormatEx(buffer, sizeof(buffer), "%t %t", "SF2 Prefix", "SF2 Settings Flashlight Temperature Title");
 	g_MenuSettingsFlashlightTemp1.SetTitle(buffer);
 	g_MenuSettingsFlashlightTemp1.AddItem("0", "1k Kelvin");
 	g_MenuSettingsFlashlightTemp1.AddItem("1", "2k Kelvin");
@@ -174,7 +182,7 @@ void SetupMenus()
 	StrCat(buffer, sizeof(buffer), "Mark Steen - Compositing the intro music\n");
 	StrCat(buffer, sizeof(buffer), "Toby Fox - Compositing The World Revolving\n");
 	StrCat(buffer, sizeof(buffer), "Mammoth Mogul - For being a GREAT test subject\n");
-	StrCat(buffer, sizeof(buffer), "Egosins - For offering to host this publicly\n");
+	StrCat(buffer, sizeof(buffer), "Egosins - For offering to host this publicly\n \n");
 
 	g_MenuCredits.SetTitle(buffer);
 	g_MenuCredits.AddItem("0", "Next");
@@ -189,7 +197,7 @@ void SetupMenus()
 	StrCat(buffer, sizeof(buffer), "Narry Gewman - Imported first Slender Man model\n");
 	StrCat(buffer, sizeof(buffer), "Simply Delicious - For the awesome camera overlay\n");
 	StrCat(buffer, sizeof(buffer), "Jason278 - Page models");
-	StrCat(buffer, sizeof(buffer), "Dj-Rec0il - Running In the 90s Remix composer\n");
+	StrCat(buffer, sizeof(buffer), "Dj-Rec0il - Running In the 90s Remix composer\n \n");
 
 	g_MenuCredits1.SetTitle(buffer);
 	g_MenuCredits1.AddItem("0", "Next");
@@ -242,6 +250,7 @@ void SetupMenus()
 	StrCat(buffer, sizeof(buffer), "KanP\n");
 	StrCat(buffer, sizeof(buffer), "SAXY GIBUS MAN\n");
 	StrCat(buffer, sizeof(buffer), "Fire\n");
+	StrCat(buffer, sizeof(buffer), "Wendi\n \n");
 
 	g_MenuCredits4.SetTitle(buffer);
 	g_MenuCredits4.AddItem("0", "Next");
@@ -260,7 +269,27 @@ void SetupMenus()
 	StrCat(buffer, sizeof(buffer), "And you for playing this new way of SF2!\n \n");
 
 	g_MenuCredits5.SetTitle(buffer);
-	g_MenuCredits5.AddItem("0", "Back");
+	g_MenuCredits5.AddItem("0", "Next");
+	g_MenuCredits5.AddItem("1", "Back");
+
+	g_MenuCredits6 = new Menu(Menu_Credits6);
+
+	FormatEx(buffer, sizeof(buffer), "%t Credits\n \n", "SF2 Prefix");
+	StrCat(buffer, sizeof(buffer), "Honorable mentions\n \n");
+	StrCat(buffer, sizeof(buffer), "CookieCat + Batfoxkid - Various fixes relating to the gamemode\n");
+	StrCat(buffer, sizeof(buffer), "Blad3z - Finnish translations\n");
+	StrCat(buffer, sizeof(buffer), "x3m77rus + Blueberryy - Russian translations\n");
+	StrCat(buffer, sizeof(buffer), "Tiagoquix - Brazilian Portuguese translations\n");
+	StrCat(buffer, sizeof(buffer), "HotoCocoaco - Simplified Chinese translations\n");
+	StrCat(buffer, sizeof(buffer), "Kenzzer + KitRifty - Helping me with the new boss code and other things\n");
+	// Joako - Almost destroying the SF2M community + attempting to weaponize a sensitive case
+	// And also being a trash community manager who still thinks SF2M needs a community manager, read the GPL v3.0 license
+	/*Joako [PRTS],  — 7/28/2026 6:10 PM
+	I know this is an open source gamemode
+	I've always been aware of this, I know, I know, I know*/
+
+	g_MenuCredits6.SetTitle(buffer);
+	g_MenuCredits6.AddItem("0", "Back");
 
 	PvP_SetupMenus();
 	PvE_SetupMenus();
@@ -461,14 +490,17 @@ static int Menu_Main(Menu menu, MenuAction action, int param1, int param2)
 			case 3:
 			{
 				FakeClientCommand(param1, "sm_slghost");
+				g_MenuMain.Display(param1, 30);
 			}
 			case 4:
 			{
 				FakeClientCommand(param1, "sm_slpack");
+				g_MenuMain.Display(param1, 30);
 			}
 			case 5:
 			{
 				FakeClientCommand(param1, "sm_slnextpack");
+				g_MenuMain.Display(param1, 30);
 			}
 			case 6:
 			{
@@ -481,6 +513,10 @@ static int Menu_Main(Menu menu, MenuAction action, int param1, int param2)
 			case 8:
 			{
 				BossPreview_MainMenu(param1, 0);
+			}
+			case 9:
+			{
+				SpecialRoundMenu(param1, 0);
 			}
 		}
 	}
@@ -1183,7 +1219,7 @@ static int Menu_Settings(Menu menu, MenuAction action, int param1, int param2)
 			case 1:
 			{
 				char buffer[512];
-				FormatEx(buffer, sizeof(buffer), "%T\n \n", "SF2 Settings Hints Menu Title", param1);
+				FormatEx(buffer, sizeof(buffer), "%t %T\n \n", "SF2 Prefix", "SF2 Settings Hints Menu Title", param1);
 
 				Panel panel = new Panel();
 				panel.SetTitle(buffer);
@@ -1192,6 +1228,7 @@ static int Menu_Settings(Menu menu, MenuAction action, int param1, int param2)
 				panel.DrawItem(buffer);
 				FormatEx(buffer, sizeof(buffer), "%T", "No", param1);
 				panel.DrawItem(buffer);
+				panel.DrawItem("Back");
 
 				panel.Send(param1, Panel_SettingsHints, 30);
 				delete panel;
@@ -1199,7 +1236,7 @@ static int Menu_Settings(Menu menu, MenuAction action, int param1, int param2)
 			case 2:
 			{
 				char buffer[512];
-				FormatEx(buffer, sizeof(buffer), "%T\n \n", "SF2 Settings Mute Mode Menu Title", param1);
+				FormatEx(buffer, sizeof(buffer), "%t %T\n \n", "SF2 Prefix", "SF2 Settings Mute Mode Menu Title", param1);
 
 				Panel panel = new Panel();
 				panel.SetTitle(buffer);
@@ -1207,6 +1244,7 @@ static int Menu_Settings(Menu menu, MenuAction action, int param1, int param2)
 				panel.DrawItem("Normal");
 				panel.DrawItem("Mute opposing team");
 				panel.DrawItem("Mute opposing team except when I'm a proxy");
+				panel.DrawItem("Back");
 
 				panel.Send(param1, Panel_SettingsMuteMode, 30);
 				delete panel;
@@ -1214,7 +1252,7 @@ static int Menu_Settings(Menu menu, MenuAction action, int param1, int param2)
 			case 3:
 			{
 				char buffer[512];
-				FormatEx(buffer, sizeof(buffer), "%T\n \n", "SF2 Settings Film Grain Menu Title", param1);
+				FormatEx(buffer, sizeof(buffer), "%t %T\n \n", "SF2 Prefix", "SF2 Settings Film Grain Menu Title", param1);
 
 				Panel panel = new Panel();
 				panel.SetTitle(buffer);
@@ -1223,6 +1261,7 @@ static int Menu_Settings(Menu menu, MenuAction action, int param1, int param2)
 				panel.DrawItem(buffer);
 				FormatEx(buffer, sizeof(buffer), "%T", "No", param1);
 				panel.DrawItem(buffer);
+				panel.DrawItem("Back");
 
 				panel.Send(param1, Panel_SettingsFilmGrain, 30);
 				delete panel;
@@ -1233,22 +1272,12 @@ static int Menu_Settings(Menu menu, MenuAction action, int param1, int param2)
 			}
 			case 5:
 			{
-				char buffer[512];
-				FormatEx(buffer, sizeof(buffer), "%T\n \n", "SF2 Settings Hud Version Title", param1);
-
-				Panel panel = new Panel();
-				panel.SetTitle(buffer);
-
-				panel.DrawItem("Use the new HUD");
-				panel.DrawItem("Use the legacy HUD");
-
-				panel.Send(param1, Panel_SettingsHudVersion, 30);
-				delete panel;
+				FakeClientCommand(param1, "sm_slhud");
 			}
 			case 6:
 			{
 				char buffer[512];
-				FormatEx(buffer, sizeof(buffer), "%T\n \n", "SF2 Settings Proxy Menu Title", param1);
+				FormatEx(buffer, sizeof(buffer), "%t %T\n \n", "SF2 Prefix", "SF2 Settings Proxy Menu Title", param1);
 
 				Panel panel = new Panel();
 				panel.SetTitle(buffer);
@@ -1257,6 +1286,7 @@ static int Menu_Settings(Menu menu, MenuAction action, int param1, int param2)
 				panel.DrawItem(buffer);
 				FormatEx(buffer, sizeof(buffer), "%T", "No", param1);
 				panel.DrawItem(buffer);
+				panel.DrawItem("Back");
 
 				panel.Send(param1, Panel_SettingsProxy, 30);
 				delete panel;
@@ -1264,7 +1294,7 @@ static int Menu_Settings(Menu menu, MenuAction action, int param1, int param2)
 			case 7:
 			{
 				char buffer[512];
-				Format(buffer, sizeof(buffer), "%T\n \n", "SF2 Settings Music Volume Title", param1);
+				Format(buffer, sizeof(buffer), "%t %T\n \n", "SF2 Prefix", "SF2 Settings Music Volume Title", param1);
 
 				Panel panel = new Panel();
 				panel.SetTitle(buffer);
@@ -1274,6 +1304,7 @@ static int Menu_Settings(Menu menu, MenuAction action, int param1, int param2)
 				panel.DrawItem("50%");
 				panel.DrawItem("75%");
 				panel.DrawItem("100% (Default)");
+				panel.DrawItem("Back");
 
 				panel.Send(param1, Panel_SettingsMusicVolume, 30);
 				delete panel;
@@ -1285,13 +1316,15 @@ static int Menu_Settings(Menu menu, MenuAction action, int param1, int param2)
 			case 9:
 			{
 				char buffer[512];
-				FormatEx(buffer, sizeof(buffer), "%T\n \n", "SF2 Settings Ghost Mode Teleport Menu Title", param1);
+				FormatEx(buffer, sizeof(buffer), "%t %T\n \n", "SF2 Prefix", "SF2 Settings Ghost Mode Teleport Menu Title", param1);
 
 				Panel panel = new Panel();
 				panel.SetTitle(buffer);
 
+				panel.DrawItem("Teleport to both players and bosses");
 				panel.DrawItem("Teleport to only players");
 				panel.DrawItem("Teleport to only bosses");
+				panel.DrawItem("Back");
 
 				panel.Send(param1, Panel_SettingsGhostModeTeleport, 30);
 				delete panel;
@@ -1299,7 +1332,7 @@ static int Menu_Settings(Menu menu, MenuAction action, int param1, int param2)
 			case 10:
 			{
 				char buffer[512];
-				FormatEx(buffer, sizeof(buffer), "%T\n \n", "SF2 Settings Ghost Mode Toggle State Menu Title", param1);
+				FormatEx(buffer, sizeof(buffer), "%t %T\n \n", "SF2 Prefix", "SF2 Settings Ghost Mode Toggle State Menu Title", param1);
 
 				Panel panel = new Panel();
 				panel.SetTitle(buffer);
@@ -1307,6 +1340,7 @@ static int Menu_Settings(Menu menu, MenuAction action, int param1, int param2)
 				panel.DrawItem("Default state");
 				panel.DrawItem("Enable ghost mode upon grace period ends");
 				panel.DrawItem("Enable ghost mode upon death on RED");
+				panel.DrawItem("Back");
 
 				panel.Send(param1, Panel_SettingsGhostModeToggleState, 30);
 				delete panel;
@@ -1314,13 +1348,14 @@ static int Menu_Settings(Menu menu, MenuAction action, int param1, int param2)
 			case 11:
 			{
 				char buffer[512];
-				FormatEx(buffer, sizeof(buffer), "%T\n \n", "SF2 Settings Proxy Menu Title", param1);
+				FormatEx(buffer, sizeof(buffer), "%t %T\n \n", "SF2 Prefix", "SF2 Settings Proxy Menu Title", param1);
 
 				Panel panel = new Panel();
 				panel.SetTitle(buffer);
 
 				panel.DrawItem("Enable Ask Message");
 				panel.DrawItem("Disable Ask Message");
+				panel.DrawItem("Back");
 
 				panel.Send(param1, Panel_SettingsProxyAskMenu, 30);
 				delete panel;
@@ -1328,6 +1363,36 @@ static int Menu_Settings(Menu menu, MenuAction action, int param1, int param2)
 			case 12:
 			{
 				GetPvEMenu().Display(param1, 30);
+			}
+			case 13:
+			{
+				char buffer[512];
+				FormatEx(buffer, sizeof(buffer), "%t Show extended special round description\n \n", "SF2 Prefix");
+
+				Panel panel = new Panel();
+				panel.SetTitle(buffer);
+
+				panel.DrawItem("Show Extended Description");
+				panel.DrawItem("Hide Extended Description");
+				panel.DrawItem("Back");
+
+				panel.Send(param1, Panel_SettingsSpecialDesc, 30);
+				delete panel;
+			}
+			case 14:
+			{
+				char buffer[512];
+				FormatEx(buffer, sizeof(buffer), "%t Set flashlight type\n \n", "SF2 Prefix");
+
+				Panel panel = new Panel();
+				panel.SetTitle(buffer);
+
+				panel.DrawItem("Use Projected Flashlights");
+				panel.DrawItem("Use Standard Flashlights");
+				panel.DrawItem("Back");
+
+				panel.Send(param1, Panel_SettingsFlashlightType, 30);
+				delete panel;
 			}
 		}
 	}
@@ -1404,7 +1469,7 @@ static int Menu_Settings_Flashlighttemp1(Menu menu, MenuAction action, int param
 	{
 		if (param2 == MenuCancel_ExitBack)
 		{
-			g_MenuMain.Display(param1, 30);
+			g_MenuSettings.Display(param1, 30);
 		}
 	}
 	return 0;
@@ -1510,6 +1575,71 @@ static int Panel_SettingsProxyAskMenu(Menu menu, MenuAction action, int param1, 
 	return 0;
 }
 
+static int Panel_SettingsSpecialDesc(Menu menu, MenuAction action, int param1, int param2)
+{
+	if (action == MenuAction_Select)
+	{
+		switch (param2)
+		{
+			case 1:
+			{
+				g_PlayerPreferences[param1].PlayerPreference_SpecialFullDesc = true;
+				ClientSaveCookies(param1);
+				CPrintToChat(param1, "{lightblue}You will now see extended special round descriptions.");
+			}
+			case 2:
+			{
+				g_PlayerPreferences[param1].PlayerPreference_SpecialFullDesc = false;
+				ClientSaveCookies(param1);
+				CPrintToChat(param1, "{lightblue}You will no longer see extended special round descriptions.");
+			}
+		}
+
+		g_MenuSettings.Display(param1, 30);
+	}
+	return 0;
+}
+
+static int Panel_SettingsFlashlightType(Menu menu, MenuAction action, int param1, int param2)
+{
+	if (action == MenuAction_Select)
+	{
+		if (!g_PlayerEliminated[param1])
+		{
+			CPrintToChat(param1, "{red}You can not switch flashlight types while in match, wait until your eliminated.");
+		}
+		else
+		{
+			switch (param2)
+			{
+				case 1:
+				{
+					g_PlayerPreferences[param1].PlayerPreference_FlashlightType = true;
+					ClientSaveCookies(param1);
+
+					if (g_PlayerPreferences[param1].PlayerPreference_ProjectedFlashlight)
+					{
+						CPrintToChat(param1, "{lightblue}You will now see projected flashlights.");
+					}
+					else
+					{
+						CPrintToChat(param1, "{red}You must set 'mat_supportflashlight 1' to use projected flashlights (reconnect after setting).");
+					}
+				}
+				case 2:
+				{
+					g_PlayerPreferences[param1].PlayerPreference_FlashlightType = false;
+					ClientSaveCookies(param1);
+					CPrintToChat(param1, "{lightblue}You will no longer see projected flashlights.");
+				}
+			}
+		}
+
+		g_MenuSettings.Display(param1, 30);
+	}
+	return 0;
+}
+
 static int Panel_SettingsMuteMode(Menu menu, MenuAction action, int param1, int param2)
 {
 	if (action == MenuAction_Select)
@@ -1555,11 +1685,18 @@ static int Panel_SettingsGhostModeTeleport(Menu menu, MenuAction action, int par
 				g_PlayerPreferences[param1].PlayerPreference_GhostModeTeleportState = 0;
 				ClientUpdateListeningFlags(param1);
 				ClientSaveCookies(param1);
-				CPrintToChat(param1, "%T", "SF2 Teleport Ghost Players", param1);
+				CPrintToChat(param1, "%T", "SF2 Teleport Ghost Both", param1);
 			}
 			case 2:
 			{
 				g_PlayerPreferences[param1].PlayerPreference_GhostModeTeleportState = 1;
+				ClientUpdateListeningFlags(param1);
+				ClientSaveCookies(param1);
+				CPrintToChat(param1, "%T", "SF2 Teleport Ghost Players", param1);
+			}
+			case 3:
+			{
+				g_PlayerPreferences[param1].PlayerPreference_GhostModeTeleportState = 2;
 				ClientUpdateListeningFlags(param1);
 				ClientSaveCookies(param1);
 				CPrintToChat(param1, "%T", "SF2 Teleport Ghost Bosses", param1);
@@ -1609,6 +1746,11 @@ static int Panel_SettingsMusicVolume(Menu menu, MenuAction action, int param1, i
 {
 	if (action == MenuAction_Select)
 	{
+		if (param2 > 5)
+		{
+			g_MenuSettings.Display(param1, 30);
+			return 0;
+		}
 		float volume;
 		for (int i = 1; i < param2; i++)
 		{
@@ -1738,7 +1880,26 @@ static int Menu_Credits5(Menu menu, MenuAction action, int param1, int param2)
 		{
 			case 0:
 			{
+				g_MenuCredits6.Display(param1, MENU_TIME_FOREVER);
+			}
+			case 1:
+			{
 				g_MenuCredits4.Display(param1, MENU_TIME_FOREVER);
+			}
+		}
+	}
+	return 0;
+}
+
+static int Menu_Credits6(Menu menu, MenuAction action, int param1, int param2)
+{
+	if (action == MenuAction_Select)
+	{
+		switch (param2)
+		{
+			case 0:
+			{
+				g_MenuCredits5.Display(param1, MENU_TIME_FOREVER);
 			}
 		}
 	}
@@ -1979,186 +2140,6 @@ static int Menu_ResetQueuePoints(Menu menu, MenuAction action, int param1, int p
 			}
 
 			DisplayQueuePointsMenu(param1);
-		}
-
-		case MenuAction_End:
-		{
-			delete menu;
-		}
-	}
-	return 0;
-}
-
-void DisplayBossList(int client)
-{
-	Menu menu = new Menu(Menu_BossList);
-
-	ArrayList bossList = GetBossProfileList();
-
-	if (bossList != null)
-	{
-		char profile[SF2_MAX_PROFILE_NAME_LENGTH];
-		char displayName[SF2_MAX_NAME_LENGTH];
-		for (int i = 0; i < bossList.Length; i++)
-		{
-			bossList.GetString(i, profile, sizeof(profile));
-			NPCGetBossName(_, displayName, sizeof(displayName), profile);
-			if (displayName[0] == '\0')
-			{
-				strcopy(displayName, sizeof(displayName), profile);
-			}
-			SF2BossProfileData data;
-			g_BossProfileData.GetArray(profile, data, sizeof(data));
-			if (data.Description.Hidden)
-			{
-				continue;
-			}
-			if (data.IsPvEBoss)
-			{
-				StrCat(displayName, sizeof(displayName), " (PvE Boss)");
-			}
-			menu.AddItem(profile, displayName);
-		}
-	}
-	menu.SetTitle("%t %T\n \n", "SF2 Prefix", "SF2 Boss List Menu Title", client);
-	menu.ExitBackButton = true;
-	menu.Display(client, MENU_TIME_FOREVER);
-}
-
-static int Menu_BossList(Menu menu, MenuAction action, int param1, int param2)
-{
-	switch (action)
-	{
-		case MenuAction_Cancel:
-		{
-			if (param2 == MenuCancel_ExitBack)
-			{
-				g_MenuMain.Display(param1, 30);
-			}
-		}
-
-		case MenuAction_Select:
-		{
-			char profile[SF2_MAX_PROFILE_NAME_LENGTH];
-			menu.GetItem(param2, profile, sizeof(profile));
-			SF2BossProfileData data;
-			g_BossProfileData.GetArray(profile, data, sizeof(data));
-			Menu newMenu = new Menu(Menu_BossDisplay);
-			char buffer[256], buffer2[128];
-			data.Names.GetString(Difficulty_Normal, buffer2, sizeof(buffer2));
-			FormatEx(buffer, sizeof(buffer), "%t %s\n \n", "SF2 Prefix", buffer2);
-			FormatEx(buffer2, sizeof(buffer2), "Type: %s\n \n", data.Description.Type);
-			StrCat(buffer, sizeof(buffer), buffer2);
-			SF2ChaserBossProfileData chaserData;
-			if (g_ChaserBossProfileData.GetArray(profile, chaserData, sizeof(chaserData)))
-			{
-				FormatEx(buffer2, sizeof(buffer2), "Walk speed: %s\n", ConvertWalkSpeedToDescription(chaserData.WalkSpeed[Difficulty_Normal]));
-			}
-			StrCat(buffer, sizeof(buffer), buffer2);
-			float speed = data.RunSpeed[Difficulty_Normal];
-			SF2StatueBossProfileData statueData;
-			if (g_StatueBossProfileData.GetArray(profile, statueData, sizeof(statueData)))
-			{
-				speed *= 10.0;
-			}
-			FormatEx(buffer2, sizeof(buffer2), "Run speed: %s\n \n", ConvertRunSpeedToDescription(speed));
-			StrCat(buffer, sizeof(buffer), buffer2);
-			FormatEx(buffer2, sizeof(buffer2), "%s", data.Description.Information);
-			ReplaceString(buffer2, sizeof(buffer2), "\\n", "\n");
-			StrCat(buffer, sizeof(buffer), buffer2);
-			newMenu.SetTitle(buffer);
-			newMenu.AddItem("", "", ITEMDRAW_SPACER);
-			newMenu.ExitBackButton = true;
-			newMenu.Display(param1, MENU_TIME_FOREVER);
-		}
-
-		case MenuAction_End:
-		{
-			delete menu;
-		}
-	}
-	return 0;
-}
-
-static char[] ConvertWalkSpeedToDescription(float speed)
-{
-	char buffer[128];
-	buffer = "None";
-	if (speed > 0.0 && speed <= 45.0)
-	{
-		buffer = "Very slow";
-	}
-	else if (speed > 45.0 && speed <= 65.0)
-	{
-		buffer = "Slow";
-	}
-	else if (speed > 65.0 && speed <= 85.0)
-	{
-		buffer = "Moderate";
-	}
-	else if (speed > 85.0 && speed <= 120.0)
-	{
-		buffer = "Average";
-	}
-	else if (speed > 120.0 && speed <= 150.0)
-	{
-		buffer = "Fast";
-	}
-	else
-	{
-		buffer = "Very fast";
-	}
-
-	return buffer;
-}
-
-static char[] ConvertRunSpeedToDescription(float speed)
-{
-	char buffer[128];
-	buffer = "None";
-	if (speed > 0.0 && speed <= 50.0)
-	{
-		buffer = "Very slow";
-	}
-	else if (speed > 50.0 && speed <= 150.0)
-	{
-		buffer = "Slow";
-	}
-	else if (speed > 150.0 && speed <= 250.0)
-	{
-		buffer = "Moderate";
-	}
-	else if (speed > 250.0 && speed <= 300.0)
-	{
-		buffer = "Average";
-	}
-	else if (speed > 300.0 && speed <= 350.0)
-	{
-		buffer = "Fast";
-	}
-	else
-	{
-		buffer = "Very fast";
-	}
-
-	return buffer;
-}
-
-static int Menu_BossDisplay(Menu menu, MenuAction action, int param1, int param2)
-{
-	switch (action)
-	{
-		case MenuAction_Cancel:
-		{
-			if (param2 == MenuCancel_ExitBack)
-			{
-				DisplayBossList(param1);
-			}
-		}
-
-		case MenuAction_Select:
-		{
-			DisplayBossList(param1);
 		}
 
 		case MenuAction_End:

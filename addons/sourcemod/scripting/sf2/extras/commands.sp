@@ -4,6 +4,7 @@
 #define _sf2_commands_included
 
 #pragma semicolon 1
+#pragma newdecls required
 
 public void OnPluginStart()
 {
@@ -71,7 +72,6 @@ public void OnPluginStart()
 	}
 
 	g_Pages = new ArrayList(sizeof(SF2PageEntityData));
-	g_PageMusicRanges = new ArrayList(3);
 	g_EmptySpawnPagePoints = new ArrayList();
 	g_PageLocations = new ArrayList();
 	g_PageLocationsGlow = new ArrayList();
@@ -113,6 +113,8 @@ public void OnPluginStart()
 
 	g_DragonsFuryBurningBonusConVar = FindConVar("tf_fireball_burning_bonus");
 	g_DragonsFuryBurnDurationConVar = FindConVar("tf_fireball_burn_duration");
+
+	g_TFBotForceClassConVar = FindConVar("tf_bot_force_class");
 
 	g_PlayerShakeEnabledConVar = CreateConVar("sf2_player_shake_enabled", "1", "Enable/Disable player view shake during boss encounters.", _, true, 0.0, true, 1.0);
 	g_PlayerShakeEnabledConVar.AddChangeHook(OnConVarChanged);
@@ -255,7 +257,6 @@ public void OnPluginStart()
 	g_HudSync = CreateHudSynchronizer();
 	g_HudSync2 = CreateHudSynchronizer();
 	g_HudSync3 = CreateHudSynchronizer();
-	g_HudSync4 = CreateHudSynchronizer();
 	g_RoundTimerSync = CreateHudSynchronizer();
 	g_Cookie = RegClientCookie("sf2_newcookies", "", CookieAccess_Private);
 
@@ -323,9 +324,10 @@ public void OnPluginStart()
 	RegConsoleCmd("sm_listboss", BossPreview_MainMenu, "", FCVAR_HIDDEN);
 	RegConsoleCmd("sm_bosspack", BossPreview_MainMenu, "", FCVAR_HIDDEN);
 	RegConsoleCmd("sm_slafk", Command_NoPoints);
-	RegConsoleCmd("sm_flashlight", Command_ToggleFlashlight);
 	RegConsoleCmd("sm_slhud", Command_MenuSwitchHud);
 	RegConsoleCmd("sm_slviewbob", Command_MenuViewBob);
+	RegConsoleCmd("sm_slspecial", SpecialRoundMenu);
+	RegConsoleCmd("sm_sf2special", SpecialRoundMenu);
 	RegConsoleCmd("+sprint", Command_SprintOn);
 	RegConsoleCmd("-sprint", Command_SprintOff);
 	RegConsoleCmd("+blink", Command_BlinkOn);
@@ -436,9 +438,12 @@ public void OnPluginStart()
 	g_OnGameFramePFwd = new PrivateForward(ET_Ignore);
 	g_OnRoundStartPFwd = new PrivateForward(ET_Ignore);
 	g_OnRoundEndPFwd = new PrivateForward(ET_Ignore);
+	g_OnConfigsExecutedPFwd = new PrivateForward(ET_Ignore);
 	g_OnEntityCreatedPFwd = new PrivateForward(ET_Ignore, Param_Cell, Param_String);
 	g_OnEntityDestroyedPFwd = new PrivateForward(ET_Ignore, Param_Cell, Param_String);
 	g_OnEntityTeleportedPFwd = new PrivateForward(ET_Ignore, Param_Cell, Param_Cell);
+	g_OnPostInitMapEntitiesPFwd = new PrivateForward(ET_Ignore);
+	g_OnPostInitNewGamePFwd = new PrivateForward(ET_Ignore);
 	g_OnPlayerJumpPFwd = new PrivateForward(ET_Ignore, Param_Cell);
 	g_OnPlayerSpawnPFwd = new PrivateForward(ET_Ignore, Param_Cell);
 	g_OnPlayerTakeDamagePFwd = new PrivateForward(ET_Hook, Param_Cell, Param_CellByRef, Param_CellByRef, Param_FloatByRef, Param_CellByRef);
@@ -450,6 +455,7 @@ public void OnPluginStart()
 	g_OnPlayerEscapePFwd = new PrivateForward(ET_Ignore, Param_Cell);
 	g_OnPlayerTeamPFwd = new PrivateForward(ET_Ignore, Param_Cell, Param_Cell);
 	g_OnPlayerClassPFwd = new PrivateForward(ET_Ignore, Param_Cell);
+	g_OnPlayerPressButtonPFwd = new PrivateForward(ET_Ignore, Param_Cell, Param_Cell);
 	g_OnPlayerLookAtBossPFwd = new PrivateForward(ET_Ignore, Param_Cell, Param_Cell);
 	g_OnPlayerChangePlayStatePFwd = new PrivateForward(ET_Ignore, Param_Cell, Param_Cell, Param_Cell);
 	g_OnPlayerChangeGhostStatePFwd = new PrivateForward(ET_Ignore, Param_Cell, Param_Cell);
@@ -460,12 +466,15 @@ public void OnPluginStart()
 	g_OnPlayerTurnOffFlashlightPFwd = new PrivateForward(ET_Ignore, Param_Cell);
 	g_OnPlayerFlashlightBreakPFwd = new PrivateForward(ET_Ignore, Param_Cell);
 	g_OnPlayerAverageUpdatePFwd = new PrivateForward(ET_Ignore, Param_Cell);
+	g_OnPlayerPostWeaponsPFwd = new PrivateForward(ET_Ignore, Param_Cell);
+	g_OnPageCountChangedPFwd = new PrivateForward(ET_Ignore, Param_Cell, Param_Cell);
 	g_OnSpecialRoundStartPFwd = new PrivateForward(ET_Ignore, Param_Cell);
+	g_OnBossAddedPFwd = new PrivateForward(ET_Ignore, Param_Cell);
 	g_OnBossSpawnPFwd = new PrivateForward(ET_Ignore, Param_Cell);
 	g_OnBossRemovedPFwd = new PrivateForward(ET_Ignore, Param_Cell);
 	g_OnChaserGetAttackActionPFwd = new PrivateForward(ET_Hook, Param_Cell, Param_String, Param_CellByRef);
 	g_OnChaserGetCustomAttackPossibleStatePFwd = new PrivateForward(ET_Hook, Param_Cell, Param_String, Param_Cell);
-	g_OnChaserUpdatePosturePFwd = new PrivateForward(ET_Hook, Param_Cell, Param_String, Param_Cell);
+	g_OnChaserUpdatePosturePFwd = new PrivateForward(ET_Hook, Param_Cell, Param_String, Param_Cell, Param_Array);
 	g_OnDifficultyChangePFwd = new PrivateForward(ET_Ignore, Param_Cell, Param_Cell);
 	g_OnDifficultyVoteFinishedPFwd = new PrivateForward(ET_Hook, Param_Cell, Param_CellByRef);
 	g_OnRenevantTriggerWavePFwd = new PrivateForward(ET_Ignore, Param_Cell, Param_Cell);
@@ -500,10 +509,11 @@ public void OnPluginStart()
 	SetupDeathCams();
 	SetupGhost();
 	SetupProxy();
+	SetupPlayerWeapons();
 	SetupHints();
 	SetupStatic();
 	SetupFlashlight();
-	SetupMusic();
+	SetupNewMusic();
 	SetupSprint();
 	SetupUltravision();
 	SetupPlayerGlows();
@@ -616,13 +626,14 @@ static Action Command_MenuSwitchHud(int client, int args)
 	}
 
 	char buffer[512];
-	FormatEx(buffer, sizeof(buffer), "%T\n \n", "SF2 Settings Hud Version Title", client);
+	FormatEx(buffer, sizeof(buffer), "%t %T\n \n", "SF2 Prefix", "SF2 Settings Hud Version Title", client);
 
 	Panel panel = new Panel();
 	panel.SetTitle(buffer);
 
 	panel.DrawItem("Use the new HUD");
 	panel.DrawItem("Use the legacy HUD");
+	panel.DrawItem("Back");
 
 	panel.Send(client, Panel_SettingsHudVersion, 30);
 	delete panel;
@@ -636,11 +647,12 @@ static Action Command_MenuViewBob(int client, int args)
 		return Plugin_Continue;
 	}
 	char buffer[512];
-	FormatEx(buffer, sizeof(buffer), "%T\n \n", "SF2 Settings View Bobbing Toggle Title", client);
+	FormatEx(buffer, sizeof(buffer), "%t %T\n \n", "SF2 Prefix", "SF2 Settings View Bobbing Toggle Title", client);
 	Panel panel = new Panel();
 	panel.SetTitle(buffer);
 	panel.DrawItem("Enable View Bobbing");
 	panel.DrawItem("Disable View Bobbing");
+	panel.DrawItem("Back");
 	panel.Send(client, Panel_SettingsViewBobbing, 30);
 	delete panel;
 	return Plugin_Handled;
@@ -675,29 +687,6 @@ static Action Command_NoPoints(int client, int args)
 		g_PlayerNoPoints[client] = false;
 		AFK_SetTime(client);
 	}
-	return Plugin_Handled;
-}
-
-static Action Command_ToggleFlashlight(int client, int args)
-{
-	if (!g_Enabled)
-	{
-		return Plugin_Continue;
-	}
-
-	if (!IsValidClient(client) || !IsPlayerAlive(client))
-	{
-		return Plugin_Handled;
-	}
-
-	if (!IsRoundInWarmup() && !IsRoundInIntro() && !IsRoundEnding() && !DidClientEscape(client))
-	{
-		if (GetGameTime() >= ClientGetFlashlightNextInputTime(client))
-		{
-			ClientHandleFlashlight(client);
-		}
-	}
-
 	return Plugin_Handled;
 }
 
@@ -1070,7 +1059,7 @@ static Action Hook_CommandSuicideAttempt(int client, const char[] command,int ar
 		}
 	}
 
-	if (IsClientInPvP(client)) //Nobody asked you to cheat your way out of PvP to miss a kill.
+	if (IsClientInPvP(client) && !IsRoundEnding()) //Nobody asked you to cheat your way out of PvP to miss a kill.
 	{
 		return Plugin_Handled;
 	}
@@ -1110,7 +1099,7 @@ static Action Hook_CommandPreventJoinTeam(int client, const char[] command,int a
 		}
 	}
 
-	if (IsClientInPvP(client)) //Nobody asked you to cheat your way out of PvP to miss a kill.
+	if (IsClientInPvP(client) && !IsRoundEnding()) //Nobody asked you to cheat your way out of PvP to miss a kill.
 	{
 		return Plugin_Handled;
 	}
@@ -1199,10 +1188,17 @@ static Action Command_ClientKillDeathcam(int client, int args)
 		return Plugin_Handled;
 	}
 
+	int bossIndex = StringToInt(arg2);
+	bool includeEliminated = false;
+	if (SF2NPC_BaseNPC(bossIndex).IsValid() && (SF2NPC_BaseNPC(bossIndex).Flags & SFF_ATTACKWAITERS) != 0)
+	{
+		includeEliminated = true;
+	}
+
 	for (int i = 0; i < target_count; i++)
 	{
 		int target = target_list[i];
-		if (!IsValidClient(target) || !IsPlayerAlive(target) || g_PlayerEliminated[target] || IsClientInGhostMode(target))
+		if (!IsValidClient(target) || !IsPlayerAlive(target) || (!includeEliminated && g_PlayerEliminated[target]) || IsClientInGhostMode(target))
 		{
 			continue;
 		}
@@ -1499,11 +1495,6 @@ static Action Command_RemoveAllSlenders(int client, int args)
 		}
 	}
 
-	if (MusicActive())
-	{
-		NPCStopMusic();
-	}
-
 	return Plugin_Handled;
 }
 
@@ -1787,9 +1778,11 @@ static Action Command_ReloadProfiles(int client, int args)
 	if (g_Enabled)
 	{
 		ReloadRestrictedWeapons();
+		ReloadModifiedWeapons();
 		ReloadSpecialRounds();
 		ReloadClassConfigs();
 		BossPreview_ReloadPack();
+		ReloadEscapeConfig();
 	}
 
 	for (int i = 0; i < MAX_BOSSES; i++)
@@ -2372,24 +2365,41 @@ static Action Command_AddSlender(int client, int args)
 		return Plugin_Handled;
 	}
 
-	char profile[SF2_MAX_PROFILE_NAME_LENGTH];
+	char profile[SF2_MAX_PROFILE_NAME_LENGTH], error[100];
 	GetCmdArg(1, profile, sizeof(profile));
 
+	if (!AddSlenderViaCommand(profile, error, sizeof(error)))
+	{
+		ReplyToCommand(client, error);
+		return Plugin_Handled;
+	}
+
+	return Plugin_Handled;
+}
+
+bool AddSlenderViaCommand(const char[] profile, char[] error = "", int errorSize = 0, bool fake = false, bool silent = false)
+{
 	if (!IsProfileValid(profile))
 	{
-		ReplyToCommand(client, "That boss does not exist!");
-		return Plugin_Handled;
+		strcopy(error, errorSize, "That boss does not exist!");
+		return false;
 	}
 
 	SF2BossProfileData data;
 	g_BossProfileData.GetArray(profile, data, sizeof(data));
 	if (data.IsPvEBoss)
 	{
-		ReplyToCommand(client, "You may not spawn PvE bosses!");
-		return Plugin_Handled;
+		strcopy(error, errorSize, "You may not spawn PvE bosses!");
+		return false;
 	}
 
-	SF2NPC_BaseNPC npc = AddProfile(profile);
+	int flags = 0;
+	if (fake)
+	{
+		flags = flags | SFF_FAKE;
+	}
+
+	SF2NPC_BaseNPC npc = AddProfile(profile, flags, .playSpawnSound = !silent);
 	if (npc.IsValid())
 	{
 		if (SF_IsBoxingMap() && (GetRoundState() == SF2RoundState_Escape) && NPCChaserIsBoxingBoss(npc.Index))
@@ -2398,7 +2408,7 @@ static Action Command_AddSlender(int client, int args)
 		}
 	}
 
-	return Plugin_Handled;
+	return true;
 }
 
 static void NPCSpawn(const char[] output, int ent, int activator, float delay)
@@ -2490,35 +2500,13 @@ static Action Command_AddSlenderFake(int client, int args)
 		return Plugin_Handled;
 	}
 
-	char profile[SF2_MAX_PROFILE_NAME_LENGTH];
+	char profile[SF2_MAX_PROFILE_NAME_LENGTH], error[100];
 	GetCmdArg(1, profile, sizeof(profile));
 
-	if (!IsProfileValid(profile))
+	if (!AddSlenderViaCommand(profile, error, sizeof(error), true))
 	{
-		ReplyToCommand(client, "That boss does not exist!");
+		ReplyToCommand(client, error);
 		return Plugin_Handled;
-	}
-
-	SF2BossProfileData data;
-	g_BossProfileData.GetArray(profile, data, sizeof(data));
-	if (data.IsPvEBoss)
-	{
-		ReplyToCommand(client, "You may not spawn PvE bosses!");
-		return Plugin_Handled;
-	}
-
-	SF2NPC_BaseNPC npc = AddProfile(profile, SFF_FAKE);
-	if (npc.IsValid())
-	{
-		float eyePos[3], eyeAng[3], pos[3];
-		GetClientEyePosition(client, eyePos);
-		GetClientEyeAngles(client, eyeAng);
-
-		Handle trace = TR_TraceRayFilterEx(eyePos, eyeAng, MASK_NPCSOLID, RayType_Infinite, TraceRayDontHitEntity, client);
-		TR_GetEndPosition(pos, trace);
-		delete trace;
-
-		npc.Spawn(pos);
 	}
 
 	return Plugin_Handled;
