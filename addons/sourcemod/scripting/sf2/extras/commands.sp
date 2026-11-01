@@ -2018,10 +2018,10 @@ static Action Command_ForceGhost(int client,int args)
 	}
 
 	char arg1[32];
-	decl String:toggle[3];
+	char toggle[3];
 	GetCmdArg(1, arg1, sizeof(arg1));
 	GetCmdArg(2, toggle, sizeof(toggle));
-	new iToggle = -1;
+	int iToggle = -1;
 	iToggle = StringToInt(toggle);
 
 	char target_name[MAX_TARGET_LENGTH];
