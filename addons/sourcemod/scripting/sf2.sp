@@ -7644,7 +7644,7 @@ static ArrayList GetNewBossRoundProfileList()
 		g_BossMainConVar.GetString(mainBoss, sizeof(mainBoss));
 
 		int index = bossList.FindString(mainBoss);
-		if (index != -1)
+		if (index != -1 && g_NewBossRoundIncludeMain.IntValue != 1)
 		{
 			// Main boss exists; remove him from the list.
 			bossList.Erase(index);
