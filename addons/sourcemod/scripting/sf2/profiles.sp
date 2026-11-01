@@ -1813,4 +1813,6 @@ static any Native_GetIsPvEBoss(Handle plugin, int numParams)
 	{
 		return ThrowNativeError(SP_ERROR_NATIVE, "Invalid profile object handle %x", profileData);
 	}
+	
+	return profileData.IsPvEBoss;
 }

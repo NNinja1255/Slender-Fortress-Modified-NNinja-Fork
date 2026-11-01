@@ -1582,7 +1582,6 @@ bool SelectProfile(SF2NPC_BaseNPC npc, const char[] profile, int additionalBossF
 			char name[SF2_MAX_NAME_LENGTH];
 			ArrayList arrayNames2;
 			arrayNames2 = GetBossProfileNames(profile);
-			int difficulty = g_DifficultyConVar.IntValue;
 
 			switch (difficulty)
 			{
