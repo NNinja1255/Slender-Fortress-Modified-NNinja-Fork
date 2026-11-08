@@ -613,6 +613,7 @@ PrivateForward g_OnGamemodeEndPFwd;
 PrivateForward g_OnMapStartPFwd;
 PrivateForward g_OnMapEndPFwd;
 PrivateForward g_OnGameFramePFwd;
+PrivateForward g_OnTrueGameFramePFwd;
 PrivateForward g_OnRoundStartPFwd;
 PrivateForward g_OnRoundEndPFwd;
 PrivateForward g_OnConfigsExecutedPFwd;
@@ -1735,6 +1736,12 @@ static Action Timer_GlobalGameFrame(Handle timer)
 	Call_Finish();
 
 	return Plugin_Continue;
+}
+
+public void OnGameFrame()
+{
+	Call_StartForward(g_OnTrueGameFramePFwd);
+	Call_Finish();
 }
 
 Action Hook_CommandBuild(int client, const char[] command, int argc)
